@@ -51,8 +51,16 @@ namespace NeonProtocol.Maps.Shaolin
 
         private void SpawnFireBlast()
         {
-            // Use NeonPooler
-            // NeonPooler.Instance.Spawn("DragonFire", transform.position, transform.rotation);
+            if (NeonProtocol.Core.Systems.NeonPooler.Instance != null)
+            {
+                var blast = NeonProtocol.Core.Systems.NeonPooler.Instance.Spawn("DragonFire", transform.position + transform.forward * 2f, transform.rotation);
+                if (blast == null)
+                    Debug.LogWarning("DragonFire prefab not in pool!");
+            }
+            else
+            {
+                Debug.LogWarning("NeonPooler Instance not found!");
+            }
         }
 
         private void Update()

@@ -26,11 +26,11 @@ namespace NeonProtocol.Maps.Radioactive
             else if (string.IsNullOrEmpty(_slotB))
             {
                 _slotB = ingredientName;
-                Mix chemicals();
+                Mix();
             }
         }
 
-        private void Mix chemicals()
+        private void Mix() // Fixed function name case from 'Mix chemicals' to 'Mix'
         {
             foreach (var recipe in recipes)
             {
@@ -38,14 +38,25 @@ namespace NeonProtocol.Maps.Radioactive
                     (recipe.ingredientA == _slotB && recipe.ingredientB == _slotA))
                 {
                     // Success
-                    Instantiate(recipe.resultPrefab, transform.position, Quaternion.identity);
+                    if (recipe.resultPrefab != null)
+                        Instantiate(recipe.resultPrefab, transform.position + Vector3.up, Quaternion.identity);
+                    else
+                        Debug.Log($"Created {_slotA}+{_slotB} Item!");
+                    
                     ClearSlots();
                     return;
                 }
             }
             
             // Failure - Explosion?
-            Debug.Log("Volatile Mixture! BOOM!");
+            if (NeonProtocol.Core.Systems.NeonPooler.Instance != null)
+            {
+                NeonProtocol.Core.Systems.NeonPooler.Instance.Spawn("Explosion", transform.position, Quaternion.identity);
+            }
+            else
+            {
+                Debug.Log("Volatile Mixture! BOOM! (No Pooler)");
+            }
             ClearSlots();
         }
 

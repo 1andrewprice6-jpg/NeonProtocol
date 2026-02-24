@@ -36,11 +36,23 @@ namespace NeonProtocol.Maps.Rave
             }
         }
 
-        // Slasher Boss Logic placeholder
+        // Slasher Boss Logic
         public void SpawnSlasher()
         {
-            // Spawn logic for Slasher who only takes damage in Rave Mode
-            // Logic: if (!_isRaveMode) slasher.invulnerable = true;
+            if (NeonProtocol.Core.Systems.NeonPooler.Instance != null)
+            {
+                var slasher = NeonProtocol.Core.Systems.NeonPooler.Instance.Spawn("Slasher", transform.position + Vector3.up * 2, Quaternion.identity);
+                if (slasher != null)
+                {
+                    // If we had a specific Slasher component, we'd access it here.
+                    // For now, we assume the prefab handles its own initialization via OnSpawn.
+                    Debug.Log("Slasher Spawned in Rave Mode!");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("NeonPooler Instance not found!");
+            }
         }
     }
 }
