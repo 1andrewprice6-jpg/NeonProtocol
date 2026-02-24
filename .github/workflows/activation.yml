@@ -1,19 +1,26 @@
 name: Unity License Activation 🔑
 
 on:
-  workflow_dispatch: # Allows you to run this manually
+  workflow_dispatch:
 
 jobs:
   activation:
     name: Generate Activation File
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Request Activation File
-        uses: game-ci/unity-request-activation-file@v2
-        id: get_alf
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: "" # Empty license forces activation file generation
+        with:
+          targetPlatform: Android
+          customParameters: -batchmode -nographics -createManualActivationFile -quit
 
       - name: Upload Activation File
         uses: actions/upload-artifact@v4
         with:
-          name: Unity_v2022.3.10f1.alf
-          path: ${{ steps.get_alf.outputs.filePath }}
+          name: Unity-Activation-File
+          path: ./*.alf
