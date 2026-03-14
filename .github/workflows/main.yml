@@ -42,7 +42,14 @@ jobs:
             Library-Android-
             Library-
 
-      # Step 4: Utilize the Unity Builder node
+      # Step 4: Activate the Unity license using the stored secret
+      - name: Activate Unity License
+        run: |
+          echo "$UNITY_LICENSE" > Unity_vX.ulf
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+      # Step 5: Utilize the Unity Builder node
       - name: Compile Unity APK
         uses: game-ci/unity-builder@v4
         env:
@@ -55,7 +62,7 @@ jobs:
           buildName: NeonProtocol
           allowDirtyBuild: true
 
-      # Step 5: Return the compiled APK to your mobile node
+      # Step 6: Return the compiled APK to your mobile node
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
