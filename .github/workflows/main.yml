@@ -14,7 +14,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Utilize the Unity Builder node
+      # Step 2: Cache the Unity Library folder to speed up subsequent builds
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Android-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Android-
+            Library-
+
+      # Step 3: Utilize the Unity Builder node
       - name: Compile Unity APK
         uses: game-ci/unity-builder@v4
         env:
@@ -26,7 +36,7 @@ jobs:
           buildName: NeonProtocol
           allowDirtyBuild: true
 
-      # Step 3: Return the compiled APK to your mobile node
+      # Step 4: Return the compiled APK to your mobile node
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
