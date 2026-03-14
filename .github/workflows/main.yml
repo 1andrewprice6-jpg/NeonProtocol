@@ -2,8 +2,10 @@ name: Neon Protocol Android Forge
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - 'Assets/**'
+      - 'Packages/**'
+      - 'ProjectSettings/**'
   workflow_dispatch:
 
 jobs:
