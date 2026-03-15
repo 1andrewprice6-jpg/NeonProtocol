@@ -10,19 +10,17 @@ namespace NeonProtocol.Maps.Beast.Environment
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag("Player") && NeonMovement.Instance != null)
             {
-                // In a real scenario, you'd modify the gravity value in NeonMovement
-                // For this architecture, we send a message or modify a public float
-                Debug.Log("Entered Low Gravity");
+                NeonMovement.Instance.SetGravityMultiplier(gravityMultiplier);
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag("Player") && NeonMovement.Instance != null)
             {
-                Debug.Log("Exited Low Gravity");
+                NeonMovement.Instance.SetGravityMultiplier(1f);
             }
         }
     }

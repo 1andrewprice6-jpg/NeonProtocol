@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace NeonProtocol.Core.Data
 {
-    [CreateAssetMenu(fileName = "New Weapon", menuMenuName = "NeonProtocol/WeaponData")]
+    [CreateAssetMenu(fileName = "New Weapon", menuName = "NeonProtocol/WeaponData")]
     public class WeaponData : ScriptableObject
     {
         public string weaponName;

@@ -6,8 +6,6 @@ using NeonProtocol.Core.Movement;
 
 namespace NeonProtocol.Core.Interactions
 {
-    public enum PerkType { TuffNuff, UpNAtoms, BangBangs, TrailBlazers }
-
     public class PerkMachine : MonoBehaviour
     {
         [Header("Perk Configuration")]
@@ -56,9 +54,11 @@ namespace NeonProtocol.Core.Interactions
 
         private void ApplyBangBangs()
         {
-            // Assuming we added these fields to PlayerCombat
-            // PlayerCombat.Instance.damageMultiplier = 2.0f;
-            // PlayerCombat.Instance.fireRateMultiplier = 0.67f; // (Increases rate by 33%)
+            if (PlayerCombat.Instance != null)
+            {
+                PlayerCombat.Instance.damageMultiplier *= 2.0f;
+                PlayerCombat.Instance.fireRateMultiplier *= 0.67f;
+            }
             Debug.Log("Bang Bangs Active: Double Damage & High Fire Rate.");
         }
 
