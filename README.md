@@ -17,14 +17,17 @@ The CI workflow (`.github/workflows/main.yml`) builds an Android APK automatical
 
 ### One-Time License Setup
 
-1. **Generate an activation file** – Go to the **Actions** tab, select **Unity License Activation**, click **Run workflow**, and download the `Unity-Activation-File` artifact (a `.alf` file).
-2. **Get a license file** – Visit [https://license.unity3d.com](https://license.unity3d.com), sign in with your Unity account, upload the `.alf` file, and download the returned `.ulf` license file.
-3. **Add secrets** – In the repository go to **Settings → Secrets and variables → Actions** and add:
+1. **Activate Unity locally** – Install [Unity Hub](https://unity.com/download), sign in with your Unity account, and activate a Personal or Pro license. The license file (`.ulf`) is stored automatically:
+   - **Windows**: `C:\ProgramData\Unity\Unity_lic.ulf`
+   - **macOS**: `/Library/Application Support/Unity/Unity_lic.ulf`
+   - **Linux**: `~/.local/share/unity3d/Unity/Unity_lic.ulf`
+2. **Add secrets** – In the repository go to **Settings → Secrets and variables → Actions** and add:
    | Secret name | Value |
    |---|---|
-   | `UNITY_LICENSE` | Full text content of the downloaded `.ulf` file |
+   | `UNITY_LICENSE` | Full text content of the `.ulf` file from step 1 |
    | `UNITY_EMAIL` | Your Unity account email address |
    | `UNITY_PASSWORD` | Your Unity account password |
+3. **Verify** – Go to the **Actions** tab, select **Unity License Activation**, and click **Run workflow** to confirm the secrets are working.
 
 ### Triggering a Build
 
