@@ -18,7 +18,7 @@ The CI workflow (`.github/workflows/main.yml`) builds an Android APK automatical
 ### One-Time License Setup
 
 1. **Generate an activation file** – Go to the **Actions** tab, select **Unity License Activation**, click **Run workflow**, and download the `Unity-Activation-File` artifact (a `.alf` file).
-2. **Get a license file** – Visit [https://license.unity3d.com](https://license.unity3d.com), sign in with your Unity account, upload the `.alf` file, and download the returned `.ulf` license file.
+2. **Get a license file** – Visit [https://license.unity3d.com/manual](https://license.unity3d.com/manual), sign in with your Unity account, upload the `.alf` file, and download the returned `.ulf` license file.
 3. **Add secrets** – In the repository go to **Settings → Secrets and variables → Actions** and add:
    | Secret name | Value |
    |---|---|
