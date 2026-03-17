@@ -8,6 +8,9 @@ on:
       - 'ProjectSettings/**'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   buildForAndroid:
     name: Build Android APK
@@ -15,7 +18,7 @@ jobs:
     steps:
       # Step 1: Extract the code from your repository
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Step 2: Verify required Unity license secrets are configured
       - name: Verify Unity License Secrets
@@ -36,7 +39,7 @@ jobs:
 
       # Step 3: Cache the Unity Library folder to speed up subsequent builds
       - name: Cache Unity Library
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: Library
           key: Library-Android-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
@@ -58,7 +61,7 @@ jobs:
 
       # Step 5: Return the compiled APK to your mobile node
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: NeonProtocol-Android-Build
           path: build/Android/NeonProtocol.apk
