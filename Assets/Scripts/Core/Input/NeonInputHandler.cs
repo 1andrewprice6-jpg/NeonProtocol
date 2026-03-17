@@ -32,6 +32,25 @@ namespace NeonProtocol.Core.Input
         {
             Instance = this;
             SetupInput();
+            // Set initial touch canvas state without waiting for the first Update frame
+            touchCanvas.SetActive(Gamepad.current == null);
+        }
+
+        private void OnEnable()
+        {
+            InputSystem.onDeviceChange += OnInputDeviceChange;
+        }
+
+        private void OnDisable()
+        {
+            InputSystem.onDeviceChange -= OnInputDeviceChange;
+        }
+
+        // Called when a device is added/removed – avoids polling every frame
+        private void OnInputDeviceChange(InputDevice device, InputDeviceChange change)
+        {
+            if (device is Gamepad)
+                touchCanvas.SetActive(Gamepad.current == null);
         }
 
         private void SetupInput()
@@ -54,11 +73,6 @@ namespace NeonProtocol.Core.Input
 
         private void Update()
         {
-            // Auto-detect gamepad vs touch
-            bool isGamepad = Gamepad.current != null;
-            if (touchCanvas.activeSelf == isGamepad)
-                touchCanvas.SetActive(!isGamepad);
-
             MoveInput = _moveAction.ReadValue<Vector2>();
             LookInput = _lookAction.ReadValue<Vector2>();
             FireInput = _fireAction.IsPressed();

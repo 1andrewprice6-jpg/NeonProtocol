@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using NeonProtocol.Core.Input;
 using NeonProtocol.Core.Systems;
 using NeonProtocol.Core.AI;
@@ -20,11 +22,26 @@ namespace NeonProtocol.Core.Combat
         private float _nextFireTime;
         private int _currentAmmo;
         private Transform _camTransform;
+        private Queue<GameObject> _hitEffectPool;
+        private const int HitEffectPoolSize = 10;
+        private const float HitEffectLifetime = 2f;
 
         private void Awake()
         {
             _camTransform = Camera.main.transform;
             _currentAmmo = maxAmmo;
+
+            // Pre-warm hit effect pool to avoid Instantiate spikes during combat
+            _hitEffectPool = new Queue<GameObject>(HitEffectPoolSize);
+            if (hitEffectPrefab)
+            {
+                for (int i = 0; i < HitEffectPoolSize; i++)
+                {
+                    var fx = Instantiate(hitEffectPrefab);
+                    fx.SetActive(false);
+                    _hitEffectPool.Enqueue(fx);
+                }
+            }
         }
 
         private void Update()
@@ -51,10 +68,30 @@ namespace NeonProtocol.Core.Combat
                     zombie.TakeDamage(damage);
                 }
 
-                // Visual Hit Logic (Use pooling for these in production)
+                // Pooled hit effect – no allocation on each shot
                 if (hitEffectPrefab)
-                    Instantiate(hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+                    SpawnHitEffect(hit.point, hit.normal);
             }
+        }
+
+        private void SpawnHitEffect(Vector3 point, Vector3 normal)
+        {
+            // Overflow objects are also returned to the pool by ReturnHitEffectToPool,
+            // so the pool self-regulates to the maximum concurrent in-flight count.
+            GameObject fx = _hitEffectPool.Count > 0
+                ? _hitEffectPool.Dequeue()
+                : Instantiate(hitEffectPrefab);
+
+            fx.transform.SetPositionAndRotation(point, Quaternion.LookRotation(normal));
+            fx.SetActive(true);
+            StartCoroutine(ReturnHitEffectToPool(fx));
+        }
+
+        private IEnumerator ReturnHitEffectToPool(GameObject fx)
+        {
+            yield return new WaitForSeconds(HitEffectLifetime);
+            fx.SetActive(false);
+            _hitEffectPool.Enqueue(fx);
         }
 
         public void Reload()
