@@ -3,19 +3,22 @@ name: Unity License Activation 🔑
 on:
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   activation:
     name: Generate Activation File
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Request Activation File
         uses: game-ci/unity-request-activation-file@v2
 
       - name: Upload Activation File
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Unity-Activation-File
           path: ./*.alf
