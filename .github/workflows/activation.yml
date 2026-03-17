@@ -12,10 +12,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Request Activation File
+        id: getManualLicenseFile
         uses: game-ci/unity-request-activation-file@v2
+        with:
+          unityVersion: 2022.3.10f1
 
-      - name: Upload Activation File
+      - name: Expose as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Unity-Activation-File
-          path: ./*.alf
+          name: Manual Activation File
+          path: ${{ steps.getManualLicenseFile.outputs.filePath }}
