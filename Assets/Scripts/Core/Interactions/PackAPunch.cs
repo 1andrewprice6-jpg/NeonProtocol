@@ -12,23 +12,19 @@ namespace NeonProtocol.Core.Interactions
 
         protected override void OnPurchaseSuccess()
         {
-            // Get current weapon from player
-            // NeonWeapon currentWeapon = PlayerCombat.Instance.GetCurrentWeapon();
-            
-            // if (currentWeapon != null && !currentWeapon.IsUpgraded)
-            // {
-            //    UpgradeWeapon(currentWeapon);
-            // }
+            if (PlayerCombat.Instance != null)
+            {
+                PlayerCombat.Instance.damageMultiplier *= damageMultiplier;
+                PlayerCombat.Instance.BoostAmmo(ammoBoost);
+                if (upgradedMaterial != null)
+                {
+                    var weaponModel = PlayerCombat.Instance.GetCurrentWeapon()?.weaponModel;
+                    if (weaponModel != null && weaponModel.TryGetComponent(out Renderer rend))
+                        rend.material = upgradedMaterial;
+                }
+            }
             Debug.Log("Weapon Upgraded! Neon Infused!");
         }
 
-        private void UpgradeWeapon(NeonWeapon weapon)
-        {
-            // weapon.Damage *= damageMultiplier;
-            // weapon.MaxAmmo *= ammoBoost;
-            // weapon.IsUpgraded = true;
-            // weapon.ApplyMaterial(upgradedMaterial);
-            // weapon.PlayUpgradeSound();
-        }
     }
 }

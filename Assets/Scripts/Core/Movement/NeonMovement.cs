@@ -6,6 +6,8 @@ namespace NeonProtocol.Core.Movement
     [RequireComponent(typeof(CharacterController))]
     public class NeonMovement : MonoBehaviour
     {
+        public static NeonMovement Instance;
+
         [Header("Settings")]
         [SerializeField] private float walkSpeed = 6f;
         [SerializeField] private float sprintSpeed = 10f;
@@ -19,8 +21,19 @@ namespace NeonProtocol.Core.Movement
         private bool _isSliding;
         private float _slideTimer;
         private Vector3 _slideDir;
+        private float _gravityMultiplier = 1.0f;
+        private float _sprintSpeedMultiplier = 1.0f;
 
-        private void Awake() => _controller = GetComponent<CharacterController>();
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            _controller = GetComponent<CharacterController>();
+        }
 
         private void Update()
         {
@@ -39,7 +52,7 @@ namespace NeonProtocol.Core.Movement
             
             // Sprint Logic
             bool isSprinting = NeonInputHandler.Instance.SprintInput && input.y > 0;
-            float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
+            float currentSpeed = isSprinting ? sprintSpeed * _sprintSpeedMultiplier : walkSpeed;
 
             // Slide Logic (G-Slide)
             if (NeonInputHandler.Instance.CrouchInput && isSprinting && !_isSliding)
@@ -89,8 +102,12 @@ namespace NeonProtocol.Core.Movement
 
         private void ApplyGravity()
         {
-            _velocity.y += gravity * Time.deltaTime;
+            _velocity.y += gravity * _gravityMultiplier * Time.deltaTime;
             _controller.Move(_velocity * Time.deltaTime);
         }
+
+        public void SetGravityMultiplier(float multiplier) => _gravityMultiplier = multiplier;
+
+        public void ApplySprintBoost(float multiplier) => _sprintSpeedMultiplier = multiplier;
     }
 }
