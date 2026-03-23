@@ -29,7 +29,7 @@ namespace NeonProtocol.Core.Combat
 
         private void Update()
         {
-            if (NeonInputHandler.Instance.FireInput && Time.time >= _nextFireTime && _currentAmmo > 0)
+            if (NeonInputHandler.Instance != null && NeonInputHandler.Instance.FireInput && Time.time >= _nextFireTime && _currentAmmo > 0)
             {
                 Shoot();
             }

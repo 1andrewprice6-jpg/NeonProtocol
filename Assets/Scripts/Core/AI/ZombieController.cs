@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using NeonProtocol.Core.Systems;
 using NeonProtocol.Core.Player;
+using NeonProtocol.Core.Economy;
 
 namespace NeonProtocol.Core.AI
 {
@@ -33,8 +34,10 @@ namespace NeonProtocol.Core.AI
 
         public void OnSpawn()
         {
-            _currentHealth = baseHealth * HordeManager.Instance.HealthMultiplier;
-            _agent.speed = 3.5f * HordeManager.Instance.SpeedMultiplier;
+            float healthMul = HordeManager.Instance != null ? HordeManager.Instance.HealthMultiplier : 1f;
+            float speedMul = HordeManager.Instance != null ? HordeManager.Instance.SpeedMultiplier : 1f;
+            _currentHealth = baseHealth * healthMul;
+            _agent.speed = 3.5f * speedMul;
             _state = ZombieState.Chasing;
             _agent.enabled = true;
         }
@@ -71,8 +74,8 @@ namespace NeonProtocol.Core.AI
         public void TakeDamage(float amount)
         {
             _currentHealth -= amount;
-            // Logic for points per hit
-            Economy.PointsSystem.Instance.AddPoints(10);
+            if (PointsSystem.Instance != null)
+                PointsSystem.Instance.AddPoints(10);
 
             if (_currentHealth <= 0) Die();
         }
@@ -80,8 +83,10 @@ namespace NeonProtocol.Core.AI
         private void Die()
         {
             _state = ZombieState.Dying;
-            Economy.PointsSystem.Instance.AddPoints(60); // Kill reward
-            HordeManager.Instance.OnZombieDeath();
+            if (PointsSystem.Instance != null)
+                PointsSystem.Instance.AddPoints(60);
+            if (HordeManager.Instance != null)
+                HordeManager.Instance.OnZombieDeath();
             gameObject.SetActive(false);
         }
     }

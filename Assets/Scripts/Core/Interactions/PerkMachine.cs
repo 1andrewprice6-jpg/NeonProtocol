@@ -2,6 +2,7 @@ using UnityEngine;
 using NeonProtocol.Core.Economy;
 using NeonProtocol.Core.Player;
 using NeonProtocol.Core.Combat;
+using NeonProtocol.Core.Movement;
 
 // NOTE: PerkType enum is defined in NeonPerkMachine.cs (same namespace).
 // It was previously duplicated here, which caused a compilation error.
@@ -17,7 +18,7 @@ namespace NeonProtocol.Core.Interactions
 
         public void Interact()
         {
-            if (PointManager.Instance.TrySpendPoints(cost))
+            if (PointsSystem.Instance != null && PointsSystem.Instance.TrySpendPoints(cost))
             {
                 ApplyPerk();
             }
@@ -29,17 +30,19 @@ namespace NeonProtocol.Core.Interactions
 
         private void ApplyPerk()
         {
-            PlayerHealth playerHealth = PlayerHealth.Instance;
-
             switch (perkType)
             {
                 case PerkType.TuffNuff:
-                    playerHealth.ApplyTuffNuff();
+                    if (PlayerHealth.Instance != null)
+                        PlayerHealth.Instance.ApplyTuffNuff();
                     break;
 
                 case PerkType.UpNAtoms:
-                    playerHealth.hasUpNAtoms = true;
-                    Debug.Log("Up N Atoms Purchased: Self-Revive Active.");
+                    if (PlayerHealth.Instance != null)
+                    {
+                        PlayerHealth.Instance.hasUpNAtoms = true;
+                        Debug.Log("Up N Atoms Purchased: Self-Revive Active.");
+                    }
                     break;
 
                 case PerkType.BangBangs:
@@ -64,7 +67,8 @@ namespace NeonProtocol.Core.Interactions
 
         private void ApplyTrailBlazers()
         {
-            // No fall damage + sliding AOE — placeholder for future implementation
+            if (NeonMovement.Instance != null)
+                NeonMovement.Instance.hasTrailBlazers = true;
             Debug.Log("Trail Blazers Active: No fall damage & sliding explosions.");
         }
     }

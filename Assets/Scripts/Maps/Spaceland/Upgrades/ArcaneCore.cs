@@ -9,19 +9,38 @@ namespace NeonProtocol.Maps.Spaceland.Upgrades
     {
         [SerializeField] private ElementType currentElement;
         [SerializeField] private ParticleSystem elementalEffect;
+        [SerializeField] private int soulsRequired = 20;
+
+        private int _currentSouls;
+        private bool _isCharged;
 
         public void ApplyToWeapon(NeonWeapon weapon)
         {
-            // Logic to modify weapon damage type and VFX
+            if (!_isCharged)
+            {
+                Debug.Log($"Core not charged yet. Need {soulsRequired - _currentSouls} more souls.");
+                return;
+            }
+
             Debug.Log($"Applied {currentElement} to weapon.");
             if (elementalEffect) elementalEffect.Play();
+            _isCharged = false;
+            _currentSouls = 0;
         }
 
-        // Logic to "collect" souls/souls requirement to charge the core
         public void AddSoul()
         {
-            // Counter ++
-            // If full, allow pickup
+            if (_isCharged) return;
+
+            _currentSouls++;
+            if (_currentSouls >= soulsRequired)
+            {
+                _isCharged = true;
+                Debug.Log($"{currentElement} core fully charged! Ready for pickup.");
+            }
         }
+
+        public bool IsCharged => _isCharged;
+        public int SoulsRemaining => Mathf.Max(0, soulsRequired - _currentSouls);
     }
 }

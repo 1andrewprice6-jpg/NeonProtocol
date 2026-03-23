@@ -13,7 +13,7 @@ namespace NeonProtocol.Core.Interactions
 
         public virtual void Interact()
         {
-            if (PointsSystem.Instance.TrySpendPoints(cost))
+            if (PointsSystem.Instance != null && PointsSystem.Instance.TrySpendPoints(cost))
             {
                 OnPurchaseSuccess();
             }
