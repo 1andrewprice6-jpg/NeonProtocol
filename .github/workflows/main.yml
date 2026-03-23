@@ -8,6 +8,11 @@ on:
       - 'ProjectSettings/**'
   workflow_dispatch:
 
+# Required so game-ci transitive deps (e.g. actions/download-artifact@v5) keep
+# working after GitHub forces all Actions runners to Node.js 24 (June 2026).
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   buildForAndroid:
     name: Build Android APK
@@ -15,7 +20,7 @@ jobs:
     steps:
       # Step 1: Extract the code from your repository
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Step 2: Verify required Unity license secrets are configured
       - name: Verify Unity License Secrets
@@ -24,7 +29,7 @@ jobs:
             echo "::error::Missing Unity license secrets."
             echo "::error::To fix this, follow the steps in README.md under 'Setting Up the Build':"
             echo "::error::  1. Run the 'Unity License Activation' workflow to generate a .alf file."
-            echo "::error::  2. Submit the .alf to https://license.unity3d.com to obtain a .ulf license file."
+            echo "::error::  2. Submit the .alf to https://license.unity3d.com/manual to obtain a .ulf license file."
             echo "::error::  3. Add the .ulf file contents as the UNITY_LICENSE repository secret."
             echo "::error::  4. Add your Unity account email as UNITY_EMAIL and password as UNITY_PASSWORD secrets."
             exit 1
@@ -36,7 +41,7 @@ jobs:
 
       # Step 3: Cache the Unity Library folder to speed up subsequent builds
       - name: Cache Unity Library
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: Library
           key: Library-Android-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
@@ -53,12 +58,13 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: Android
+          unityVersion: 2022.3.10f1
           buildName: NeonProtocol
           allowDirtyBuild: true
 
       # Step 5: Return the compiled APK to your mobile node
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: NeonProtocol-Android-Build
           path: build/Android/NeonProtocol.apk

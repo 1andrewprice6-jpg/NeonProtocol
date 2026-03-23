@@ -6,6 +6,8 @@ namespace NeonProtocol.Core.Movement
     [RequireComponent(typeof(CharacterController))]
     public class NeonMovement : MonoBehaviour
     {
+        public static NeonMovement Instance;
+
         [Header("Settings")]
         [SerializeField] private float walkSpeed = 6f;
         [SerializeField] private float sprintSpeed = 10f;
@@ -19,8 +21,19 @@ namespace NeonProtocol.Core.Movement
         private bool _isSliding;
         private float _slideTimer;
         private Vector3 _slideDir;
+        private float _gravityMultiplier = 1.0f;
+        private float _sprintSpeedMultiplier = 1.0f;
 
-        private void Awake() => _controller = GetComponent<CharacterController>();
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            _controller = GetComponent<CharacterController>();
+        }
 
         private void Update()
         {
@@ -36,10 +49,10 @@ namespace NeonProtocol.Core.Movement
         {
             Vector2 input = NeonInputHandler.Instance.MoveInput;
             Vector3 move = transform.right * input.x + transform.forward * input.y;
-            
+
             // Sprint Logic
             bool isSprinting = NeonInputHandler.Instance.SprintInput && input.y > 0;
-            float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
+            float currentSpeed = isSprinting ? sprintSpeed * _sprintSpeedMultiplier : walkSpeed;
 
             // Slide Logic (G-Slide)
             if (NeonInputHandler.Instance.CrouchInput && isSprinting && !_isSliding)
@@ -51,7 +64,7 @@ namespace NeonProtocol.Core.Movement
             {
                 _slideTimer -= Time.deltaTime;
                 _controller.Move(_slideDir * slideForce * Time.deltaTime);
-                
+
                 // Camera dip effect logic would go here
 
                 if (_slideTimer <= 0) _isSliding = false;
@@ -75,22 +88,28 @@ namespace NeonProtocol.Core.Movement
             {
                 float jumpBoost = _isSliding ? 1.2f : 1.0f; // Bunny Hop momentum
                 _velocity.y = Mathf.Sqrt(jumpForce * jumpBoost * -2f * gravity);
-                
+
                 // If jumping out of a slide, convert slide momentum to air velocity
                 if (_isSliding)
                 {
                     // This is simplified; normally you'd add lateral velocity to _velocity
                     // But CharacterController handles move() separately often.
                     // For true momentum, we'd add force to a momentum vector.
-                    _isSliding = false; 
+                    _isSliding = false;
                 }
             }
         }
 
         private void ApplyGravity()
         {
-            _velocity.y += gravity * Time.deltaTime;
+            _velocity.y += gravity * _gravityMultiplier * Time.deltaTime;
             _controller.Move(_velocity * Time.deltaTime);
         }
+
+        /// <summary>Sets a gravity scale factor (e.g. 0.3 for low-gravity zones, 1.0 to restore).</summary>
+        public void SetGravityMultiplier(float multiplier) => _gravityMultiplier = multiplier;
+
+        /// <summary>Multiplies sprint speed by the given factor (e.g. RacingStripes perk).</summary>
+        public void ApplySprintBoost(float multiplier) => _sprintSpeedMultiplier = multiplier;
     }
 }

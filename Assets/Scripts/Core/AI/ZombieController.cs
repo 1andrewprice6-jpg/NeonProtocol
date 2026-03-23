@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using NeonProtocol.Core.Systems;
+using NeonProtocol.Core.Player;
 
 namespace NeonProtocol.Core.AI
 {
@@ -63,8 +64,8 @@ namespace NeonProtocol.Core.AI
         private void Attack()
         {
             _nextAttackTime = Time.time + attackCooldown;
-            // Send damage to player
-            Debug.Log("Zombie Attacked!");
+            if (PlayerHealth.Instance != null)
+                PlayerHealth.Instance.TakeDamage(damage);
         }
 
         public void TakeDamage(float amount)
@@ -80,6 +81,7 @@ namespace NeonProtocol.Core.AI
         {
             _state = ZombieState.Dying;
             Economy.PointsSystem.Instance.AddPoints(60); // Kill reward
+            HordeManager.Instance.OnZombieDeath();
             gameObject.SetActive(false);
         }
     }

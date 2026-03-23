@@ -16,6 +16,7 @@ namespace NeonProtocol.Core.Combat
         [Header("Perk Modifiers")]
         public float damageMultiplier = 1.0f;
         public float fireRateMultiplier = 1.0f;
+        public float reloadTimeMultiplier = 1.0f;
 
         private int _currentClip;
         private int _currentReserve;
@@ -59,22 +60,20 @@ namespace NeonProtocol.Core.Combat
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, hitLayers))
             {
                 float hitboxMultiplier = 1.0f;
-                int killBonus = 50;
 
                 // Simple hitbox detection based on tags or components
                 if (hit.collider.CompareTag("Headshot"))
                 {
                     hitboxMultiplier = 2.0f;
-                    killBonus = 100;
                 }
                 else if (hit.collider.CompareTag("Limb"))
                 {
                     hitboxMultiplier = 0.5f;
                 }
 
-                if (hit.collider.TryGetComponent(out ZombieAI zombie))
+                if (hit.collider.TryGetComponent(out ZombieController zombie))
                 {
-                    PointManager.Instance.AddPoints(10); // Hit points
+                    PointsSystem.Instance.AddPoints(10); // Hit points
                     float totalDamage = currentWeapon.damage * damageMultiplier * hitboxMultiplier;
                     zombie.TakeDamage(totalDamage);
                 }
@@ -86,7 +85,7 @@ namespace NeonProtocol.Core.Combat
             if (_currentReserve <= 0 || _currentClip == currentWeapon.clipSize) yield break;
 
             _isReloading = true;
-            yield return new WaitForSeconds(currentWeapon.reloadTime);
+            yield return new WaitForSeconds(currentWeapon.reloadTime * reloadTimeMultiplier);
 
             int needed = currentWeapon.clipSize - _currentClip;
             int toLoad = Mathf.Min(needed, _currentReserve);
@@ -101,6 +100,13 @@ namespace NeonProtocol.Core.Combat
         {
             currentWeapon = newData;
             InitializeWeapon();
+        }
+
+        public NeonProtocol.Core.Data.WeaponData GetCurrentWeapon() => currentWeapon;
+
+        public void BoostAmmo(int multiplier)
+        {
+            _currentReserve *= multiplier;
         }
     }
 }

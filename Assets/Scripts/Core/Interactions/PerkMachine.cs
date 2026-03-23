@@ -2,12 +2,12 @@ using UnityEngine;
 using NeonProtocol.Core.Economy;
 using NeonProtocol.Core.Player;
 using NeonProtocol.Core.Combat;
-using NeonProtocol.Core.Movement;
+
+// NOTE: PerkType enum is defined in NeonPerkMachine.cs (same namespace).
+// It was previously duplicated here, which caused a compilation error.
 
 namespace NeonProtocol.Core.Interactions
 {
-    public enum PerkType { TuffNuff, UpNAtoms, BangBangs, TrailBlazers }
-
     public class PerkMachine : MonoBehaviour
     {
         [Header("Perk Configuration")]
@@ -30,21 +30,19 @@ namespace NeonProtocol.Core.Interactions
         private void ApplyPerk()
         {
             PlayerHealth playerHealth = PlayerHealth.Instance;
-            
+
             switch (perkType)
             {
                 case PerkType.TuffNuff:
                     playerHealth.ApplyTuffNuff();
                     break;
-                
+
                 case PerkType.UpNAtoms:
                     playerHealth.hasUpNAtoms = true;
                     Debug.Log("Up N Atoms Purchased: Self-Revive Active.");
                     break;
 
                 case PerkType.BangBangs:
-                    // Apply modifiers to Combat system
-                    // Note: We need to modify PlayerCombat to store these multipliers
                     ApplyBangBangs();
                     break;
 
@@ -56,17 +54,18 @@ namespace NeonProtocol.Core.Interactions
 
         private void ApplyBangBangs()
         {
-            // Assuming we added these fields to PlayerCombat
-            // PlayerCombat.Instance.damageMultiplier = 2.0f;
-            // PlayerCombat.Instance.fireRateMultiplier = 0.67f; // (Increases rate by 33%)
+            if (PlayerCombat.Instance != null)
+            {
+                PlayerCombat.Instance.damageMultiplier *= 2.0f;
+                PlayerCombat.Instance.fireRateMultiplier *= 0.67f;
+            }
             Debug.Log("Bang Bangs Active: Double Damage & High Fire Rate.");
         }
 
         private void ApplyTrailBlazers()
         {
-            // Set flag on movement script for sliding AOE
-            // NeonMovement.Instance.hasTrailBlazers = true;
-            Debug.Log("Trail Blazers Active: No Fall Damage & Sliding Explosions.");
+            // No fall damage + sliding AOE — placeholder for future implementation
+            Debug.Log("Trail Blazers Active: No fall damage & sliding explosions.");
         }
     }
 }
