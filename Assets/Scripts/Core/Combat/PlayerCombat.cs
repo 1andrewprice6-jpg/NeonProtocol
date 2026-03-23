@@ -22,6 +22,9 @@ namespace NeonProtocol.Core.Combat
         [Header("Blue Bolts")]
         [SerializeField] private float blueBoltsRadius = 5f;
         [SerializeField] private float blueBoltsDamage = 100f;
+        [SerializeField] private LayerMask blueBoltsLayers;
+
+        private static readonly Collider[] _blueBoltsHits = new Collider[32];
 
         private int _currentClip;
         private int _currentReserve;
@@ -108,10 +111,10 @@ namespace NeonProtocol.Core.Combat
 
         private void BlueBoltsDischarge()
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, blueBoltsRadius);
-            foreach (Collider col in hits)
+            int count = Physics.OverlapSphereNonAlloc(transform.position, blueBoltsRadius, _blueBoltsHits, blueBoltsLayers);
+            for (int i = 0; i < count; i++)
             {
-                if (col.TryGetComponent(out ZombieController zombie))
+                if (_blueBoltsHits[i].TryGetComponent(out ZombieController zombie))
                 {
                     zombie.TakeDamage(blueBoltsDamage);
                 }

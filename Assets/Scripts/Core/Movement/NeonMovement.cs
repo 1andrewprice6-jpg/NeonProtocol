@@ -29,6 +29,9 @@ namespace NeonProtocol.Core.Movement
         public bool hasTrailBlazers = false;
         [SerializeField] private float slideAoERadius = 3f;
         [SerializeField] private float slideAoEDamage = 75f;
+        [SerializeField] private LayerMask slideAoELayers;
+
+        private static readonly Collider[] _slideAoEHits = new Collider[32];
 
         private void Awake()
         {
@@ -127,10 +130,10 @@ namespace NeonProtocol.Core.Movement
 
         private void SlideAoEDamage()
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, slideAoERadius);
-            foreach (Collider col in hits)
+            int count = Physics.OverlapSphereNonAlloc(transform.position, slideAoERadius, _slideAoEHits, slideAoELayers);
+            for (int i = 0; i < count; i++)
             {
-                if (col.TryGetComponent(out ZombieController zombie))
+                if (_slideAoEHits[i].TryGetComponent(out ZombieController zombie))
                 {
                     zombie.TakeDamage(slideAoEDamage);
                 }

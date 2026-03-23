@@ -23,7 +23,7 @@ namespace NeonProtocol.Core.Interactions
                     if (UIController.Instance != null)
                         UIController.Instance.ShowPrompt(interactable.GetPrompt());
 
-                    if (NeonInputHandler.Instance.JumpInput) // Using Jump as temp Interact button
+                    if (NeonInputHandler.Instance != null && NeonInputHandler.Instance.JumpInput)
                     {
                         interactable.Interact();
                     }
