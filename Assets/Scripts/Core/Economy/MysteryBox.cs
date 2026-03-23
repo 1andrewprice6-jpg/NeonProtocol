@@ -27,7 +27,7 @@ namespace NeonProtocol.Core.Economy
             {
                 CollectWeapon();
             }
-            else if (PointManager.Instance.TrySpendPoints(boxCost))
+            else if (PointsSystem.Instance != null && PointsSystem.Instance.TrySpendPoints(boxCost))
             {
                 StartCoroutine(SpinRoutine());
             }
@@ -84,7 +84,8 @@ namespace NeonProtocol.Core.Economy
 
         private void CollectWeapon()
         {
-            PlayerCombat.Instance.SwapWeapon(_selectedWeapon);
+            if (PlayerCombat.Instance != null)
+                PlayerCombat.Instance.SwapWeapon(_selectedWeapon);
             ResetBox();
         }
 

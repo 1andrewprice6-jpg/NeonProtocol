@@ -17,6 +17,11 @@ namespace NeonProtocol.Core.Combat
         public float damageMultiplier = 1.0f;
         public float fireRateMultiplier = 1.0f;
         public float reloadTimeMultiplier = 1.0f;
+        public bool hasBlueBolts = false;
+
+        [Header("Blue Bolts")]
+        [SerializeField] private float blueBoltsRadius = 5f;
+        [SerializeField] private float blueBoltsDamage = 100f;
 
         private int _currentClip;
         private int _currentReserve;
@@ -73,7 +78,8 @@ namespace NeonProtocol.Core.Combat
 
                 if (hit.collider.TryGetComponent(out ZombieController zombie))
                 {
-                    PointsSystem.Instance.AddPoints(10); // Hit points
+                    if (PointsSystem.Instance != null)
+                        PointsSystem.Instance.AddPoints(10);
                     float totalDamage = currentWeapon.damage * damageMultiplier * hitboxMultiplier;
                     zombie.TakeDamage(totalDamage);
                 }
@@ -85,6 +91,10 @@ namespace NeonProtocol.Core.Combat
             if (_currentReserve <= 0 || _currentClip == currentWeapon.clipSize) yield break;
 
             _isReloading = true;
+
+            if (hasBlueBolts)
+                BlueBoltsDischarge();
+
             yield return new WaitForSeconds(currentWeapon.reloadTime * reloadTimeMultiplier);
 
             int needed = currentWeapon.clipSize - _currentClip;
@@ -94,6 +104,18 @@ namespace NeonProtocol.Core.Combat
             _currentReserve -= toLoad;
 
             _isReloading = false;
+        }
+
+        private void BlueBoltsDischarge()
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, blueBoltsRadius);
+            foreach (Collider col in hits)
+            {
+                if (col.TryGetComponent(out ZombieController zombie))
+                {
+                    zombie.TakeDamage(blueBoltsDamage);
+                }
+            }
         }
 
         public void SwapWeapon(NeonProtocol.Core.Data.WeaponData newData)

@@ -1,5 +1,6 @@
 using UnityEngine;
 using NeonProtocol.Core.Input;
+using NeonProtocol.Core.AI;
 
 namespace NeonProtocol.Core.Movement
 {
@@ -24,6 +25,11 @@ namespace NeonProtocol.Core.Movement
         private float _gravityMultiplier = 1.0f;
         private float _sprintSpeedMultiplier = 1.0f;
 
+        [Header("Perk State")]
+        public bool hasTrailBlazers = false;
+        [SerializeField] private float slideAoERadius = 3f;
+        [SerializeField] private float slideAoEDamage = 75f;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -47,6 +53,8 @@ namespace NeonProtocol.Core.Movement
 
         private void HandleMovement()
         {
+            if (NeonInputHandler.Instance == null) return;
+
             Vector2 input = NeonInputHandler.Instance.MoveInput;
             Vector3 move = transform.right * input.x + transform.forward * input.y;
 
@@ -80,10 +88,15 @@ namespace NeonProtocol.Core.Movement
             _isSliding = true;
             _slideTimer = slideDuration;
             _slideDir = direction.normalized;
+
+            if (hasTrailBlazers)
+                SlideAoEDamage();
         }
 
         private void HandleJump()
         {
+            if (NeonInputHandler.Instance == null) return;
+
             if (NeonInputHandler.Instance.JumpInput && _controller.isGrounded)
             {
                 float jumpBoost = _isSliding ? 1.2f : 1.0f; // Bunny Hop momentum
@@ -102,8 +115,26 @@ namespace NeonProtocol.Core.Movement
 
         private void ApplyGravity()
         {
-            _velocity.y += gravity * _gravityMultiplier * Time.deltaTime;
+            float effectiveGravity = gravity * _gravityMultiplier;
+
+            // TrailBlazers: clamp downward velocity to prevent fall damage
+            if (hasTrailBlazers && _velocity.y < -10f)
+                _velocity.y = -10f;
+
+            _velocity.y += effectiveGravity * Time.deltaTime;
             _controller.Move(_velocity * Time.deltaTime);
+        }
+
+        private void SlideAoEDamage()
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, slideAoERadius);
+            foreach (Collider col in hits)
+            {
+                if (col.TryGetComponent(out ZombieController zombie))
+                {
+                    zombie.TakeDamage(slideAoEDamage);
+                }
+            }
         }
 
         /// <summary>Sets a gravity scale factor (e.g. 0.3 for low-gravity zones, 1.0 to restore).</summary>

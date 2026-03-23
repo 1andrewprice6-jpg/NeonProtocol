@@ -63,12 +63,14 @@ namespace NeonProtocol.Core.Interactions
                     break;
 
                 case PerkType.BlueBolts:
-                    // Electric Cherry: damage on reload — placeholder for future implementation
+                    if (PlayerCombat.Instance != null)
+                        PlayerCombat.Instance.hasBlueBolts = true;
                     Debug.Log("Blue Bolts Active: Electric discharge on reload.");
                     break;
 
                 case PerkType.TrailBlazers:
-                    // No fall damage + slide explosions — placeholder for future implementation
+                    if (NeonMovement.Instance != null)
+                        NeonMovement.Instance.hasTrailBlazers = true;
                     Debug.Log("Trail Blazers Active: No fall damage & sliding explosions.");
                     break;
             }

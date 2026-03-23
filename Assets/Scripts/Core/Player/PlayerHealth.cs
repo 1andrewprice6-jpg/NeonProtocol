@@ -3,6 +3,7 @@ using System.Collections;
 using NeonProtocol.Core.Movement;
 using NeonProtocol.Core.Combat;
 using NeonProtocol.Core.Economy;
+using NeonProtocol.Core.UI;
 
 namespace NeonProtocol.Core.Player
 {
@@ -23,11 +24,13 @@ namespace NeonProtocol.Core.Player
 
         private float _lastDamageTime;
         private Coroutine _regenCoroutine;
+        private NeonMovement _movement;
 
         private void Awake()
         {
             Instance = this;
             currentHealth = maxHealth;
+            _movement = GetComponent<NeonMovement>();
         }
 
         public void TakeDamage(float amount)
@@ -65,7 +68,7 @@ namespace NeonProtocol.Core.Player
             currentHealth = 0;
             
             // Disable movement
-            GetComponent<NeonMovement>().enabled = false;
+            if (_movement != null) _movement.enabled = false;
             
             // In Solo mode, handle Self Revive
             if (hasUpNAtoms)
@@ -86,7 +89,8 @@ namespace NeonProtocol.Core.Player
             if (isDowned)
             {
                 Debug.Log("GAME OVER");
-                // Trigger Game Over UI
+                if (UIController.Instance != null)
+                    UIController.Instance.ShowGameOver();
             }
         }
 
@@ -102,7 +106,7 @@ namespace NeonProtocol.Core.Player
         {
             isDowned = false;
             currentHealth = maxHealth;
-            GetComponent<NeonMovement>().enabled = true;
+            if (_movement != null) _movement.enabled = true;
             Debug.Log("Player Revived!");
         }
 

@@ -20,8 +20,8 @@ namespace NeonProtocol.Core.Interactions
             {
                 if (hit.collider.TryGetComponent(out NeonInteractable interactable))
                 {
-                    // Update UI Prompt (e.g., "Press X to Buy Door [$1000]")
-                    // UIController.Instance.ShowPrompt(interactable.GetPrompt());
+                    if (UIController.Instance != null)
+                        UIController.Instance.ShowPrompt(interactable.GetPrompt());
 
                     if (NeonInputHandler.Instance.JumpInput) // Using Jump as temp Interact button
                     {
@@ -31,7 +31,8 @@ namespace NeonProtocol.Core.Interactions
             }
             else
             {
-                // UIController.Instance.HidePrompt();
+                if (UIController.Instance != null)
+                    UIController.Instance.HidePrompt();
             }
         }
     }

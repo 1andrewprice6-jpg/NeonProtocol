@@ -47,8 +47,11 @@ namespace NeonProtocol.Core.Systems
         private void SpawnZombie()
         {
             Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
-            NeonPooler.Instance.Spawn("Zombie", sp.position, sp.rotation);
-            _zombiesActive++;
+            if (NeonPooler.Instance != null)
+            {
+                NeonPooler.Instance.Spawn("Zombie", sp.position, sp.rotation);
+                _zombiesActive++;
+            }
         }
 
         public void OnZombieDeath()
