@@ -18,6 +18,8 @@ namespace NeonProtocol.Core.Economy
         private bool _isSpinning;
         private WeaponData _selectedWeapon;
         private bool _canCollect;
+        private GameObject _currentDisplay;
+        private Coroutine _resetCoroutine;
 
         public void Interact()
         {
@@ -56,7 +58,13 @@ namespace NeonProtocol.Core.Economy
             _canCollect = true;
             
             // Auto-despawn if not collected
-            Invoke("ResetBox", 12f);
+            _resetCoroutine = StartCoroutine(AutoResetRoutine());
+        }
+
+        private IEnumerator AutoResetRoutine()
+        {
+            yield return new WaitForSeconds(12f);
+            ResetBox();
         }
 
         private WeaponData GetWeightedRandomWeapon()
@@ -77,9 +85,9 @@ namespace NeonProtocol.Core.Economy
 
         private void UpdateDisplayModel(GameObject model)
         {
-            // Simple visual update logic
-            foreach (Transform child in weaponDisplaySocket) Destroy(child.gameObject);
-            Instantiate(model, weaponDisplaySocket);
+            // Reuse cached reference instead of iterating children each call
+            if (_currentDisplay != null) Destroy(_currentDisplay);
+            _currentDisplay = Instantiate(model, weaponDisplaySocket);
         }
 
         private void CollectWeapon()
@@ -90,10 +98,18 @@ namespace NeonProtocol.Core.Economy
 
         private void ResetBox()
         {
+            if (_resetCoroutine != null)
+            {
+                StopCoroutine(_resetCoroutine);
+                _resetCoroutine = null;
+            }
             _canCollect = false;
             _selectedWeapon = null;
-            foreach (Transform child in weaponDisplaySocket) Destroy(child.gameObject);
-            CancelInvoke("ResetBox");
+            if (_currentDisplay != null)
+            {
+                Destroy(_currentDisplay);
+                _currentDisplay = null;
+            }
         }
     }
 }

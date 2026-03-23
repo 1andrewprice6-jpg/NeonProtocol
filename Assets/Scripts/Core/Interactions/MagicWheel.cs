@@ -27,27 +27,21 @@ namespace NeonProtocol.Core.Interactions
             _isSpinning = true;
             float timer = 0;
             float switchInterval = 0.1f;
-            float nextSwitchTime = 0;
 
             GameObject currentDisplay = null;
 
             while (timer < spinDuration)
             {
-                if (Time.time >= nextSwitchTime)
-                {
-                    if (currentDisplay != null) Destroy(currentDisplay);
-                    
-                    int randomIndex = Random.Range(0, weaponPool.Count);
-                    currentDisplay = Instantiate(weaponPool[randomIndex], weaponDisplaySocket);
-                    // Disable scripts on display item
-                    if (currentDisplay.TryGetComponent(out NeonWeapon w)) w.enabled = false;
-                    
-                    nextSwitchTime = Time.time + switchInterval;
-                    switchInterval *= 1.05f; // Slow down the spin
-                }
+                if (currentDisplay != null) Destroy(currentDisplay);
 
-                timer += Time.deltaTime;
-                yield return null;
+                int randomIndex = Random.Range(0, weaponPool.Count);
+                currentDisplay = Instantiate(weaponPool[randomIndex], weaponDisplaySocket);
+                // Disable scripts on display item
+                if (currentDisplay.TryGetComponent(out NeonWeapon w)) w.enabled = false;
+
+                timer += switchInterval;
+                yield return new WaitForSeconds(switchInterval);
+                switchInterval *= 1.05f; // Slow down the spin
             }
 
             _selectedWeapon = currentDisplay;

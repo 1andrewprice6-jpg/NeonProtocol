@@ -23,11 +23,13 @@ namespace NeonProtocol.Core.Player
 
         private float _lastDamageTime;
         private Coroutine _regenCoroutine;
+        private NeonMovement _movement;
 
         private void Awake()
         {
             Instance = this;
             currentHealth = maxHealth;
+            _movement = GetComponent<NeonMovement>();
         }
 
         public void TakeDamage(float amount)
@@ -65,7 +67,7 @@ namespace NeonProtocol.Core.Player
             currentHealth = 0;
             
             // Disable movement
-            GetComponent<NeonMovement>().enabled = false;
+            _movement.enabled = false;
             
             // In Solo mode, handle Self Revive
             if (hasUpNAtoms)
@@ -102,7 +104,7 @@ namespace NeonProtocol.Core.Player
         {
             isDowned = false;
             currentHealth = maxHealth;
-            GetComponent<NeonMovement>().enabled = true;
+            _movement.enabled = true;
             Debug.Log("Player Revived!");
         }
 
