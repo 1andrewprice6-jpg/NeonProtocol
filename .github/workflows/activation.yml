@@ -26,5 +26,5 @@ jobs:
       - name: Expose as artifact
         uses: actions/upload-artifact@v6
         with:
-          name: Manual Activation File
+          name: Unity-Activation-File
           path: ${{ steps.getManualLicenseFile.outputs.filePath }}

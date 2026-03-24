@@ -25,7 +25,7 @@ jobs:
       # Step 2: Verify required Unity license secrets are configured
       - name: Verify Unity License Secrets
         run: |
-          if [ -z "$UNITY_LICENSE" ] && { [ -z "$UNITY_EMAIL" ] || [ -z "$UNITY_PASSWORD" ]; }; then
+          if [ -z "$UNITY_LICENSE" ] || [ -z "$UNITY_EMAIL" ] || [ -z "$UNITY_PASSWORD" ]; then
             echo "::error::Missing Unity license secrets."
             echo "::error::To fix this, follow the steps in README.md under 'Setting Up the Build':"
             echo "::error::  1. Run the 'Unity License Activation' workflow to generate a .alf file."
