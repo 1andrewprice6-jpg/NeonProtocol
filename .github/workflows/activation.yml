@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       # Pinned to v2.1.0 — the last release that generates a .alf file before
       # the deliberate deprecation-break introduced in v2.2.0.
@@ -24,7 +24,7 @@ jobs:
           unityVersion: 2022.3.10f1
 
       - name: Expose as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: Manual Activation File
           path: ${{ steps.getManualLicenseFile.outputs.filePath }}
